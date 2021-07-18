@@ -1,0 +1,18 @@
+SELECT a.request_at AS Day,
+Round(SUM(a.can) / SUM(a.comp), 2) AS Cancellation_Rate
+FROM (SELECT request_at,
+CASE
+WHEN T.status = T.status THEN 1
+ELSE 0
+END comp,
+CASE
+WHEN T.status IN( ‘cancelled_by_client’, ‘cancelled_by_driver’
+) THEN
+1
+ELSE 0
+END AS can
+FROM trips T
+join users U
+ON T.client_id = U.users_id
+WHERE U.banned = ‘No’) a
+GROUP BY a.request_at
